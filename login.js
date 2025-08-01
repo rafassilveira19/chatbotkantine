@@ -37,7 +37,7 @@ function estaDentroDoHorarioDeAtendimento() {
   const horarioAtual = hora * 60 + minutos;
 
   if (dia === 1) return horarioAtual >= 12 * 60 && horarioAtual < 18 * 60;
-  if (dia >= 2 && dia <= 5) return horarioAtual >= 10 * 60 && horarioAtual < 16 * 60;
+  if (dia >= 2 && dia <= 5) return horarioAtual >= 10 * 60 && horarioAtual < 18 * 60;
   if (dia === 6) return horarioAtual >= 10 * 60 && horarioAtual < 17 * 60 + 30;
 
   return false;
