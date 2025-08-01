@@ -1,25 +1,25 @@
 const {
   default: makeWASocket,
   useMultiFileAuthState,
-  DisconnectReason
-} = require('@whiskeysockets/baileys');
-const path = require('path');
-const qrcode = require('qrcode');
+  DisconnectReason,
+} = require("@whiskeysockets/baileys");
+const path = require("path");
+const qrcode = require("qrcode");
 
 let isReconnecting = false;
 const ultimasMensagensMinhas = new Map();
 
 const numerosBloqueados = [
-  '553493007502@s.whatsapp.net',
-  '553496830188@s.whatsapp.net',
-  '553499006476@s.whatsapp.net',
-  '553491176892@s.whatsapp.net',
-  '553499215444@s.whatsapp.net',
-  '553498819966@s.whatsapp.net',
+  "553493007502@s.whatsapp.net",
+  "553496830188@s.whatsapp.net",
+  "553499006476@s.whatsapp.net",
+  "553491176892@s.whatsapp.net",
+  "553499215444@s.whatsapp.net",
+  "553498819966@s.whatsapp.net",
 ];
 
 function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function enviarMensagemSeparada(client, from, mensagens) {
@@ -37,13 +37,14 @@ function estaDentroDoHorarioDeAtendimento() {
   const horarioAtual = hora * 60 + minutos;
 
   if (dia === 1) return horarioAtual >= 12 * 60 && horarioAtual < 18 * 60;
-  if (dia >= 2 && dia <= 5) return horarioAtual >= 10 * 60 && horarioAtual < 18 * 60;
+  if (dia >= 2 && dia <= 5)
+    return horarioAtual >= 10 * 60 && horarioAtual < 18 * 60;
   if (dia === 6) return horarioAtual >= 10 * 60 && horarioAtual < 17 * 60 + 30;
 
   return false;
 }
 
-async function createWhatsAppClient(instanceId = 'default') {
+async function createWhatsAppClient(instanceId = "default") {
   const storePath = path.join(__dirname, `auth_info_${instanceId}`);
   const { state, saveCreds } = await useMultiFileAuthState(storePath);
 
@@ -52,25 +53,28 @@ async function createWhatsAppClient(instanceId = 'default') {
     printQRInTerminal: false,
   });
 
-  client.ev.on('connection.update', async (update) => {
+  client.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
-  try {
-    qrImageData = await qrcode.toDataURL(qr); // gera imagem base64
-    console.log("📲 Acesse o link e escaneie o QR Code: http://localhost:3000");
-  } catch (err) {
-    console.error("❌ Erro ao gerar QR Code como imagem:", err);
-  }
-}
+      try {
+        qrImageData = await qrcode.toDataURL(qr); // gera imagem base64
+        console.log(
+          "📲 Acesse o link e escaneie o QR Code: http://localhost:3000",
+        );
+      } catch (err) {
+        console.error("❌ Erro ao gerar QR Code como imagem:", err);
+      }
+    }
 
-    if (connection === 'open') {
+    if (connection === "open") {
       console.log(`✅ Wpp ${instanceId} conectado com sucesso!`);
     }
 
-    if (connection === 'close') {
+    if (connection === "close") {
       const shouldReconnect =
-        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
+        lastDisconnect?.error?.output?.statusCode !==
+        DisconnectReason.loggedOut;
 
       if (shouldReconnect && !isReconnecting) {
         isReconnecting = true;
@@ -80,14 +84,16 @@ async function createWhatsAppClient(instanceId = 'default') {
           isReconnecting = false;
         }, 2000);
       } else {
-        console.log(`⚠️ Usuário deslogado da ${instanceId}. Escaneie o QR Code novamente.`);
+        console.log(
+          `⚠️ Usuário deslogado da ${instanceId}. Escaneie o QR Code novamente.`,
+        );
       }
     }
   });
 
-  client.ev.on('creds.update', saveCreds);
+  client.ev.on("creds.update", saveCreds);
 
-  client.ev.on('messages.upsert', async ({ messages }) => {
+  client.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0];
     if (!msg.message || msg.key.fromMe) {
       if (msg.key.fromMe) {
@@ -98,7 +104,7 @@ async function createWhatsAppClient(instanceId = 'default') {
     }
 
     const from = msg.key.remoteJid;
-    if (from.includes('@g.us') || numerosBloqueados.includes(from)) return;
+    if (from.includes("@g.us") || numerosBloqueados.includes(from)) return;
 
     const agora = new Date();
     const ultimaMsgMinha = ultimasMensagensMinhas.get(from);
@@ -135,17 +141,15 @@ _(aqui também mostra os produtos que temos na loja hoje 😉)_
 • Seg: 12h – 19h  
 • Ter a Sex: 09h – 19h  
 • Sáb: 09h – 18h  
-• Domingo estamos fechados`
+• Domingo estamos fechados`,
     ];
 
     const mensagensForaHorario = [
       `Olá! Seja bem-vindo(a) à Kantine 😊
       *ESSA É UMA MENSAGEM AUTOMÁTICA*
 
-Estamos fora do horário de atendimento, mas assim que alguém estiver disponível responderemos sua mensagem. *Enquanto isso, me diga como posso ajudar você*`
-
-,
- `*Cardápios:*  
+Estamos fora do horário de atendimento, mas assim que alguém estiver disponível responderemos sua mensagem. *Enquanto isso, me diga como posso ajudar você*`,
+      `*Cardápios:*  
 🎂 *Bolos e sobremesas*: https://drive.google.com/file/d/1XkH3CPugY1E1xPsGm3J3i6xZY-z4iF8P/view
 
 🛵 *Delivery ou retirada:*  
@@ -169,7 +173,7 @@ _(aqui também mostra os produtos que temos na loja hoje 😉)_
 • Seg: 12h – 19h  
 • Ter a Sex: 09h – 19h  
 • Sáb: 09h – 18h  
-• Domingo estamos fechados`
+• Domingo estamos fechados`,
     ];
 
     const mensagensParaEnviar = estaDentroDoHorarioDeAtendimento()
@@ -184,8 +188,30 @@ _(aqui também mostra os produtos que temos na loja hoje 😉)_
   return client;
 }
 
-createWhatsAppClient('kantine');
+createWhatsAppClient("kantine");
 
 setInterval(() => {
   console.log("Bot rodando...");
 }, 60000);
+
+const express = require("express");
+const app = express();
+
+let qrImageData = null; // variável global
+
+app.get("/", (req, res) => {
+  if (qrImageData) {
+    res.send(`
+      <html>
+        <body style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
+          <h2>📲 Escaneie o QR Code</h2>
+          <img src="${qrImageData}" style="width:200px;height:200px;" />
+        </body>
+      </html>
+    `);
+  } else {
+    res.send("✅ Bot já autenticado. QR não disponível.");
+  }
+});
+
+app.listen(3000, () => console.log("Ping server ativo na porta 3000"));
