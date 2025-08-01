@@ -56,14 +56,13 @@ async function createWhatsAppClient(instanceId = 'default') {
     const { connection, lastDisconnect, qr } = update;
 
     if (qr) {
-      console.log('📲 Escaneie o QR Code para autenticação:');
-      try {
-        const qrString = await qrcode.toString(qr, { type: 'terminal' });
-        console.log(qrString);
-      } catch (err) {
-        console.error('❌ Erro ao gerar o QR Code:', err);
-      }
-    }
+  try {
+    qrImageData = await qrcode.toDataURL(qr); // gera imagem base64
+    console.log("📲 Acesse o link e escaneie o QR Code: http://localhost:3000");
+  } catch (err) {
+    console.error("❌ Erro ao gerar QR Code como imagem:", err);
+  }
+}
 
     if (connection === 'open') {
       console.log(`✅ Wpp ${instanceId} conectado com sucesso!`);
