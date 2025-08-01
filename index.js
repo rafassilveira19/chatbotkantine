@@ -5,8 +5,9 @@ const {
 } = require("@whiskeysockets/baileys");
 const path = require("path");
 const qrcode = require("qrcode");
-
+let qrImageData = null; 
 let isReconnecting = false;
+
 const ultimasMensagensMinhas = new Map();
 
 const numerosBloqueados = [
@@ -196,8 +197,6 @@ setInterval(() => {
 
 const express = require("express");
 const app = express();
-
-let qrImageData = null; // variável global
 
 app.get("/", (req, res) => {
   if (qrImageData) {
